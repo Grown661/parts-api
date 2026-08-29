@@ -53,7 +53,7 @@ function persist() {
   // Schreibvorgaenge serialisieren, damit sich parallele Requests nicht ueberholen.
   writeQueue = writeQueue.then(() =>
     fs.writeFile(DATA_FILE, JSON.stringify(parts, null, 2), 'utf8')
-  );
+  ).catch((e) => console.error('persist:', e.message));
   return writeQueue;
 }
 
