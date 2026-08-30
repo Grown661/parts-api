@@ -395,6 +395,11 @@ const server = http.createServer(async (req, res) => {
           sendJson(res, 400, { error: 'invalid JSON body' });
           return;
         }
+        // JSON.parse('null') liefert null ohne Fehler -> ohne Check gaebe es 500 statt 400
+        if (!body || typeof body !== 'object' || Array.isArray(body)) {
+          sendJson(res, 400, { error: 'invalid body' });
+          return;
+        }
         const { errors, out } = validatePart(body);
         if (errors.length) {
           sendJson(res, 400, { error: 'validation failed', details: errors });
@@ -423,6 +428,11 @@ const server = http.createServer(async (req, res) => {
             body = JSON.parse((await readBody(req)) || '{}');
           } catch {
             sendJson(res, 400, { error: 'invalid JSON body' });
+            return;
+          }
+          // JSON.parse('null') liefert null ohne Fehler -> ohne Check gaebe es 500 statt 400
+          if (!body || typeof body !== 'object' || Array.isArray(body)) {
+            sendJson(res, 400, { error: 'invalid body' });
             return;
           }
           const { errors, out } = validatePart(body, { partial: true });
